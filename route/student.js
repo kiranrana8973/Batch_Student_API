@@ -9,22 +9,25 @@ const { default: mongoose } = require("mongoose");
 
 // get all users
 router.get("/", async (req, res) => {
-   return await Student.find({}).select("-password").then(
-        (student) => {
-            res.status(200).json({
-                success: true,
-                message : "List of users",
-                data: student,
-            });
-        }
-   ).catch(
-         (err) => {
+    return await Student.find({}).select("-password -__v")
+        .populate("batch", "-__v")
+        .populate("course", "-__v")
+        .then(
+            (student) => {
+                res.status(200).json({
+                    success: true,
+                    message: "List of users",
+                    data: student,
+                });
+            }
+        ).catch(
+            (err) => {
                 res.status(500).json({
                     success: false,
                     message: err,
                 });
             }
-   ); // or go to model class and set select:false
+        ); // or go to model class and set select:false
 });
 
 
@@ -66,11 +69,11 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
     }
 
     // Add course array to student object
-    if(req.body.course){
+    if (req.body.course) {
         student.course = req.body.course.split(",");
     }
 
-  
+
     // Add image to student
     const file = req.file;
     if (file) {
@@ -83,7 +86,7 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
         .then((createdStudent) => {
             res.status(201).json({
                 success: true,
-                message : "Student registered successfully",
+                message: "Student registered successfully",
                 data: createdStudent,
             });
         })
@@ -112,7 +115,11 @@ router.post('/login', async (req, res) => {
                 }
             );
 
-            res.json({ success: true, token: token });
+            res.json({
+                success: true,
+                message: "Loggedin successfully",
+                token: token
+            });
         } else {
             res
                 .status(401)
