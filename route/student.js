@@ -1,9 +1,11 @@
-const { User: Student } = require("../model/student");
+const { Student } = require("../model/student");
+const { Course } = require("../model/course");
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
+const { default: mongoose } = require("mongoose");
 
 // get all users
 router.get("/", async (req, res) => {
@@ -57,38 +59,23 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
         password: bcrypt.hashSync(req.body.password, 10),
     });
 
+    console.log(req.body.batch);
     // Add batch to student
-    if (req.body.batchId) {
-        const batch = await Batch.findById();
-        if (!batch) {
-            res.status(400).json({
-                success: false,
-                message: "Invalid batch",
-            });
-        }else{
-            student.batch = batch._id;
-        }
+    if (req.body.batch) {
+        student.batch = req.body.batch;
     }
 
-    // Add multiple courses to student
-    if (req.body.courseId) {
-        const courses = await Course
-            .find({ _id: { $in: req.body.courseId } });
-        if (!courses) {
-            res.status(400).json({
-                success: false,
-                message: "Invalid courses",
-            });
-        }else{
-            student.courses = courses.map((course) => course._id);
-        }
+    // Add course array to student object
+    if(req.body.course){
+        student.course = req.body.course.split(",");
     }
-   
+
+  
     // Add image to student
     const file = req.file;
     if (file) {
         const fileName = req.file.filename;
-        student.image = '/images/user_image/' + filename;
+        student.image = '/images/user_image/' + fileName;
     }
 
     await student
