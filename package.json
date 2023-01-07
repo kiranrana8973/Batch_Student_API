@@ -1,0 +1,27 @@
+{
+  "name": "batch_student_api",
+  "version": "1.0.0",
+  "description": "API for batch student",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kiran Rana",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.1",
+    "colors": "^1.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-jwt": "^8.3.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^6.8.3",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^2.0.20",
+    "path": "^0.12.7",
+    "yarn": "^1.22.19"
+  }
+}
