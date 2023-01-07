@@ -62,7 +62,6 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
         password: bcrypt.hashSync(req.body.password, 10),
     });
 
-    console.log(req.body.batch);
     // Add batch to student
     if (req.body.batch) {
         student.batch = req.body.batch;
@@ -72,7 +71,6 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
     if (req.body.course) {
         student.course = req.body.course.split(",");
     }
-
 
     // Add image to student
     const file = req.file;

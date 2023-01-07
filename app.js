@@ -35,7 +35,7 @@ app.use(express.urlencoded({ urlencoded: true }));
 //Routers
 app.use(`${api}/batch`, batchRouter);
 app.use(`${api}/course`, courseRouter);
-app.use(`${api}/student`, studentRouter);
+app.use(`${api}/student`,studentRouter);
 
 
 // Display message in home page
