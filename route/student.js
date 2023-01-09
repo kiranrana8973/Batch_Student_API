@@ -68,9 +68,14 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
     }
 
     // Add course array to student object
-    if (req.body.course) {
-        student.course = req.body.course.split(",");
+    if(req.body.course){
+        student.course = student.course.concat(req.body.course)
     }
+    // if (req.body.course) {
+    //     student.course = req.body.course.split(",");
+    // }
+
+
 
     // Add image to student
     const file = req.file;
