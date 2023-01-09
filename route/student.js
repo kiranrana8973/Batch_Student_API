@@ -6,7 +6,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const { default: mongoose } = require("mongoose");
-
+const fs = require('fs');
+const path = require('path');
 // get all users
 router.get("/", async (req, res) => {
     return await Student.find({}).select("-password -__v")
@@ -70,12 +71,11 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
     // Add course array to student object
     if(req.body.course){
         student.course = student.course.concat(req.body.course)
+        //student.course = req.body.course.split(",");
     }
     // if (req.body.course) {
     //     student.course = req.body.course.split(",");
     // }
-
-
 
     // Add image to student
     const file = req.file;
@@ -99,6 +99,19 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
                 message: err,
             });
         });
+});
+
+// Delete student with image
+router.delete('/:id', async (req,res)=>{
+    console.log(req.params.id);
+    const student = await Student.findByIdAndRemove(req.params.id);
+    console.log(student);
+    fs.unlinkSync('C:/Users/kiran/Documents/API/Batch_Student_API', student.image);
+    // res.json({
+    //     success: true,
+    //     message: "Loggedin successfully",
+    //     token: token
+    // });
 });
 
 router.post('/login', async (req, res) => {
