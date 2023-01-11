@@ -1,29 +1,28 @@
-const {Batch} = require("../model/batch");
+const { Batch } = require("../model/batch");
 const express = require("express");
 const router = express.Router();
 
 // get all batches
-router.get("/", async (req, res) => {
-    return await Batch.find({}).then(
+router.get("/", (req, res) => {
+    Batch.find({}).then(
         (batch) => {
             res.status(200).json({
                 success: true,
-                message : "List of batches",
+                message: "List of batches",
                 data: batch,
             });
-        }
-    ).catch(
-        (err) => {
-            res.status(500).json({
-                success: false,
-                message: err,
-            });
-        }
-    ); // or go to model class and set select:false
+        }).catch(
+            (err) => {
+                res.status(500).json({
+                    success: false,
+                    message: err,
+                });
+            }
+        ); // or go to model class and set select:false
 });
 
 // Add batch
-router.post("/", async (req, res) => {
+router.post("/", (req, res) => {
     const batch = new Batch({
         batchName: req.body.batchName,
     });
@@ -31,7 +30,7 @@ router.post("/", async (req, res) => {
         (batch) => {
             res.status(200).json({
                 success: true,
-                message : "Batch added successfully",
+                message: "Batch added successfully",
                 data: batch,
             });
         }

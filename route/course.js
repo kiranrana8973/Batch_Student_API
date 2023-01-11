@@ -3,8 +3,8 @@ const express = require("express");
 const router = express.Router();
 
 // get all courses
-router.get("/", async (req, res) => {
-    return await Course.find({}).then(
+router.get("/", (req, res) => {
+    return Course.find({}).then(
         (course) => {
             res.status(200).json({
                 success: true,
@@ -23,7 +23,7 @@ router.get("/", async (req, res) => {
 });
 
 // Add course
-router.post("/", async (req, res) => {
+router.post("/", (req, res) => {
     const course = new Course({
         courseName: req.body.courseName,
     });

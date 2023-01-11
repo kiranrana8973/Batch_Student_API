@@ -6,12 +6,12 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const fs = require('fs');
+const path = require('path');
 const verifyUser = require('../middleware/jwt');
-const { dirname } = require("path");
 
 // get all student with bearer token
-router.get("/", verifyUser, async (req, res) => {
-    return await Student.find({}).select("-password -__v")
+router.get("/", verifyUser, (req, res) => {
+    Student.find({}).select("-password -__v")
         .populate("batch", "-__v")
         .populate("course", "-__v")
         .then(
@@ -33,10 +33,10 @@ router.get("/", verifyUser, async (req, res) => {
 });
 
 // Search students by batchId
-router.get('/searchStudentByBatch/:batchId', verifyUser, async (req, res) => {
+router.get('/searchStudentByBatch/:batchId', verifyUser, (req, res) => {
     const batchId = req.params.batchId;
-    console.log(batchId);
-    await Student.find({ batch: batchId })
+
+    Student.find({ batch: batchId })
         .select("-password -__v")
         .populate("batch", "-__v")
         .then((student) => {
@@ -53,14 +53,16 @@ router.get('/searchStudentByBatch/:batchId', verifyUser, async (req, res) => {
                 });
             }
         );
+
+
+
 });
 
 
 // Search student by courseid from course array
-router.get('/searchStudentByCourse/:courseId', verifyUser, async (req, res) => {
+router.get('/searchStudentByCourse/:courseId', verifyUser, (req, res) => {
     const courseId = req.params.courseId;
-    console.log(courseId);
-    await Student.find({ course: courseId })
+    Student.find({ course: courseId })
         .select("-password -__v")
         .then(
             (student) => {
@@ -103,7 +105,7 @@ var storage = multer.diskStorage({
 
 var uploadOptions = multer({ storage: storage });
 // Register user
-router.post("/", uploadOptions.single("image"), async (req, res) => {
+router.post("/", uploadOptions.single("image"), (req, res) => {
     const student = new Student({
         fname: req.body.fname,
         lname: req.body.lname,
@@ -132,7 +134,7 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
         student.image = '/images/user_image/' + fileName;
     }
 
-    await student
+    student
         .save()
         .then((createdStudent) => {
             res.status(201).json({
@@ -187,35 +189,36 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.delete("/:id", async (req, res) => {
-    const student = await Student.findById(req.params.id);
-    if (student) {
-        await student.remove();
-        var dir = __dirname.split('\\')
-        var user_image_dir = dir.slice(0, dir.length - 1).join('\\'); // remove the last \route  from array
-        var path = user_image_dir + student.image.replace(/\//g, "\\");
-        await fs.unlinkSync(path).then(
-            (data) => {
-                res.status(200).json({
-                    success: true,
-                    message: "Student deleted successfully",
+router.delete("/:id", (req, res) => {
+
+    Student.findByIdAndDelete(req.params.id)
+        .then(student => {
+            if (student!=null) 
+            {
+                var path2 = path.join(__dirname, "..", student.image);
+                fs.unlink(path2, (err) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    res.status(200).json({
+                        success: true,
+                        message: "Student deleted successfully",
+                    });
                 });
-            }) .catch((err) => {
-                res.status(500).json({
+            }else{
+                res.status(400).json({
                     success: false,
-                    message: err,
+                    message: "Student not found",
                 });
-            });;  
-    } else {
-        res.status(404).send("Student not found");
-    }
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                success: false,
+                message: err.message,
+            });
+
+        });
 });
 
-// // Delete student with image
-// router.delete('/:id', async (req, res) => {
-//     console.log(req.params.id);
-//     const student = await Student.findByIdAndRemove(req.params.id);
-//     console.log(student);
-//     fs.unlinkSync('C:/Users/kiran/Documents/API/Batch_Student_API', student.image);
-// });
 module.exports = router;
