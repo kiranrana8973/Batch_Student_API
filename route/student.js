@@ -5,10 +5,9 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
-const { default: mongoose } = require("mongoose");
 const fs = require('fs');
-const path = require('path');
 const verifyUser = require('../middleware/jwt');
+const { dirname } = require("path");
 
 // get all student with bearer token
 router.get("/", verifyUser, async (req, res) => {
@@ -34,7 +33,7 @@ router.get("/", verifyUser, async (req, res) => {
 });
 
 // Search students by batchId
-router.get('/searchStudent/:batchId', verifyUser, async (req, res) => {
+router.get('/searchStudentByBatch/:batchId', verifyUser, async (req, res) => {
     const batchId = req.params.batchId;
     console.log(batchId);
     await Student.find({ batch: batchId })
@@ -150,19 +149,6 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
         });
 });
 
-// Delete student with image
-router.delete('/:id', async (req, res) => {
-    console.log(req.params.id);
-    const student = await Student.findByIdAndRemove(req.params.id);
-    console.log(student);
-    fs.unlinkSync('C:/Users/kiran/Documents/API/Batch_Student_API', student.image);
-    // res.json({
-    //     success: true,
-    //     message: "Loggedin successfully",
-    //     token: token
-    // });
-});
-
 router.post('/login', async (req, res) => {
     const student = await Student.findOne({ username: req.body.username });
     const secretKey = process.env.SECRET_KEY;
@@ -205,10 +191,31 @@ router.delete("/:id", async (req, res) => {
     const student = await Student.findById(req.params.id);
     if (student) {
         await student.remove();
-        res.json({ success: true });
+        var dir = __dirname.split('\\')
+        var user_image_dir = dir.slice(0, dir.length - 1).join('\\'); // remove the last \route  from array
+        var path = user_image_dir + student.image.replace(/\//g, "\\");
+        await fs.unlinkSync(path).then(
+            (data) => {
+                res.status(200).json({
+                    success: true,
+                    message: "Student deleted successfully",
+                });
+            }) .catch((err) => {
+                res.status(500).json({
+                    success: false,
+                    message: err,
+                });
+            });;  
     } else {
         res.status(404).send("Student not found");
     }
 });
 
+// // Delete student with image
+// router.delete('/:id', async (req, res) => {
+//     console.log(req.params.id);
+//     const student = await Student.findByIdAndRemove(req.params.id);
+//     console.log(student);
+//     fs.unlinkSync('C:/Users/kiran/Documents/API/Batch_Student_API', student.image);
+// });
 module.exports = router;

@@ -23,6 +23,7 @@ app.use(
     express.static(path.join(__dirname, "/images"))
 );
 
+
 const api = process.env.API_URL;
 const batchRouter = require('./route/batch');
 const courseRouter = require('./route/course');
@@ -47,4 +48,5 @@ app.get("/", (req, res) => {
 //Server
 app.listen(process.env.PORT || 3000, () => {
     console.log("Server running at http://localhost:3000".yellow.underline.bold);
+
 });
