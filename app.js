@@ -5,6 +5,7 @@ const connectDB = require("./config/db");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
+
 require("colors");
 
 app.use(cors());

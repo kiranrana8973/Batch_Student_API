@@ -9,7 +9,8 @@ const { default: mongoose } = require("mongoose");
 const fs = require('fs');
 const path = require('path');
 const verifyUser = require('../middleware/jwt');
-// get all users with bearer token
+
+// get all student with bearer token
 router.get("/", verifyUser, async (req, res) => {
     return await Student.find({}).select("-password -__v")
         .populate("batch", "-__v")
@@ -18,7 +19,7 @@ router.get("/", verifyUser, async (req, res) => {
             (student) => {
                 res.status(200).json({
                     success: true,
-                    message: "List of users",
+                    message: "List of students",
                     data: student,
                 });
             }
@@ -30,6 +31,53 @@ router.get("/", verifyUser, async (req, res) => {
                 });
             }
         ); // or go to model class and set select:false
+});
+
+// Search students by batchId
+router.get('/searchStudent/:batchId', verifyUser, async (req, res) => {
+    const batchId = req.params.batchId;
+    console.log(batchId);
+    await Student.find({ batch: batchId })
+        .select("-password -__v")
+        .populate("batch", "-__v")
+        .then((student) => {
+            res.status(201).json({
+                success: true,
+                message: "List of students by batch",
+                data: student,
+            });
+        }).catch(
+            (err) => {
+                res.status(500).json({
+                    success: false,
+                    message: err,
+                });
+            }
+        );
+});
+
+
+// Search student by courseid from course array
+router.get('/searchStudentByCourse/:courseId', verifyUser, async (req, res) => {
+    const courseId = req.params.courseId;
+    console.log(courseId);
+    await Student.find({ course: courseId })
+        .select("-password -__v")
+        .then(
+            (student) => {
+                res.status(201).json({
+                    success: true,
+                    message: "List of students by course",
+                    data: student,
+                });
+            }).catch(
+                (err) => {
+                    res.status(500).json({
+                        success: false,
+                        message: err,
+                    });
+                }
+            );
 });
 
 
