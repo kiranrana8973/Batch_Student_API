@@ -8,8 +8,9 @@ const multer = require("multer");
 const { default: mongoose } = require("mongoose");
 const fs = require('fs');
 const path = require('path');
-// get all users
-router.get("/", async (req, res) => {
+const verifyUser = require('../middleware/jwt');
+// get all users with bearer token
+router.get("/", verifyUser, async (req, res) => {
     return await Student.find({}).select("-password -__v")
         .populate("batch", "-__v")
         .populate("course", "-__v")
@@ -69,7 +70,7 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
     }
 
     // Add course array to student object
-    if(req.body.course){
+    if (req.body.course) {
         student.course = student.course.concat(req.body.course)
         //student.course = req.body.course.split(",");
     }
@@ -102,7 +103,7 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
 });
 
 // Delete student with image
-router.delete('/:id', async (req,res)=>{
+router.delete('/:id', async (req, res) => {
     console.log(req.params.id);
     const student = await Student.findByIdAndRemove(req.params.id);
     console.log(student);
