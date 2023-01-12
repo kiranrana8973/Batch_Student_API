@@ -33,8 +33,8 @@ router.get("/", verifyUser, (req, res) => {
 });
 
 // Search students by batchId
-router.get('/searchStudentByBatch/:batchId', verifyUser, (req, res) => {
-    const batchId = req.params.batchId;
+router.get('/searchStudentByBatch', verifyUser, (req, res) => {
+    const batchId = req.query.batchId;
 
     Student.find({ batch: batchId })
         .select("-password -__v")
@@ -53,15 +53,12 @@ router.get('/searchStudentByBatch/:batchId', verifyUser, (req, res) => {
                 });
             }
         );
-
-
-
 });
 
-
 // Search student by courseid from course array
-router.get('/searchStudentByCourse/:courseId', verifyUser, (req, res) => {
-    const courseId = req.params.courseId;
+router.get('/searchStudentByCourse', verifyUser, (req, res) => {
+    const courseId = req.query.courseId;
+    console.log(courseId);
     Student.find({ course: courseId })
         .select("-password -__v")
         .then(
@@ -193,9 +190,8 @@ router.delete("/:id", (req, res) => {
 
     Student.findByIdAndDelete(req.params.id)
         .then(student => {
-            if (student!=null) 
-            {
-                var path2 = path.join(__dirname, "..", student.image);
+            if (student != null) {
+                var path = path.join(__dirname, "..", student.image);
                 fs.unlink(path2, (err) => {
                     if (err) {
                         console.log(err);
@@ -205,7 +201,7 @@ router.delete("/:id", (req, res) => {
                         message: "Student deleted successfully",
                     });
                 });
-            }else{
+            } else {
                 res.status(400).json({
                     success: false,
                     message: "Student not found",
