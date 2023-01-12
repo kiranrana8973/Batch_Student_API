@@ -29,38 +29,40 @@ router.get("/", verifyUser, (req, res) => {
                     message: err,
                 });
             }
-        ); // or go to model class and set select:false
+        ); 
 });
 
 // Search students by batchId
 router.get('/searchStudentByBatch', verifyUser, (req, res) => {
     const batchId = req.query.batchId;
-
     Student.find({ batch: batchId })
-        .select("-password -__v")
-        .populate("batch", "-__v")
-        .then((student) => {
+    .populate("batch", "-__v")
+    .populate("course", "-__v")
+    .then(
+        (student) => {
             res.status(201).json({
                 success: true,
                 message: "List of students by batch",
                 data: student,
             });
-        }).catch(
-            (err) => {
-                res.status(500).json({
-                    success: false,
-                    message: err,
-                });
-            }
-        );
+        }
+    ).catch(
+        (err) => {
+            res.status(500).json({
+                success: false,
+                message: err,
+            });
+        }
+    ); 
 });
 
 // Search student by courseid from course array
 router.get('/searchStudentByCourse', verifyUser, (req, res) => {
     const courseId = req.query.courseId;
-    console.log(courseId);
     Student.find({ course: courseId })
         .select("-password -__v")
+        .populate("batch", "-__v")
+        .populate("course", "-__v")
         .then(
             (student) => {
                 res.status(201).json({
@@ -68,14 +70,15 @@ router.get('/searchStudentByCourse', verifyUser, (req, res) => {
                     message: "List of students by course",
                     data: student,
                 });
-            }).catch(
-                (err) => {
-                    res.status(500).json({
-                        success: false,
-                        message: err,
-                    });
-                }
-            );
+            }
+        ).catch(
+            (err) => {
+                res.status(500).json({
+                    success: false,
+                    message: err,
+                });
+            }
+        ); 
 });
 
 
