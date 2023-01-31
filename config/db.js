@@ -4,7 +4,7 @@ require('colors');
 // and all other fields will not be saved
 mongoose.set('strictQuery', true);
 const connectDB = async () => {
-  const conn = await mongoose.connect(process.env.CONNECTION_STRING);
+  const conn = await mongoose.connect(process.env.CONNECTION_STRING_ATLAS);
   console.log(
     `MongoDB connected to : ${conn.connection.host}`.cyan.underline.bold
   );
